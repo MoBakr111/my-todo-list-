@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مهامي الذكية | Mohamed Bakr</title>
+    <title>قائمة مهامي الذكية</title>
     <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -18,23 +18,25 @@
             font-family: 'Almarai', sans-serif;
             background-color: var(--bg);
             background-image: radial-gradient(circle at 10% 20%, rgba(108, 99, 255, 0.1) 0%, transparent 20%);
-            color: var(--text); margin: 0; padding-top: 60px; overflow-x: hidden;
+            color: var(--text); margin: 0; padding-top: 80px; overflow-x: hidden;
+            display: flex; flex-direction: column; min-height: 100vh;
         }
 
-        /* --- الهيدر والـ 3 شرط --- */
+        /* --- تصليح الشريط العلوي --- */
         .top-bar {
-            position: fixed; top: 0; width: 100%; height: 60px;
+            position: fixed; top: 0; left: 0; width: 100%; height: 60px;
             background: var(--glass); backdrop-filter: blur(10px);
-            display: flex; align-items: center; padding: 0 20px; z-index: 1000;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 15px; z-index: 1000; box-sizing: border-box;
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .menu-btn {
             font-size: 24px; cursor: pointer; color: var(--accent);
-            background: none; border: none; margin-left: 15px;
+            background: none; border: none; padding: 5px;
         }
 
-        /* --- القائمة الجانبية (Sidebar) --- */
+        /* --- القائمة الجانبية --- */
         .sidebar {
             position: fixed; top: 0; right: -280px; width: 280px; height: 100%;
             background: var(--sidebar-bg); z-index: 2000; transition: 0.4s;
@@ -56,17 +58,17 @@
             background: rgba(0,0,0,0.6); z-index: 1500; display: none;
         }
 
-        /* --- محتوى الصفحة --- */
+        /* --- المحتوى --- */
         .container {
             background: var(--glass); backdrop-filter: blur(15px);
             width: 90%; max-width: 400px; padding: 30px; border-radius: 24px;
-            margin: 20px auto; border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 0 auto 40px auto; border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .input-box { display: flex; gap: 10px; margin-bottom: 25px; }
         input {
             flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.3); color: white; outline: none;
+            background: rgba(0,0,0,0.3); color: white; outline: none; font-family: 'Almarai';
         }
 
         button#add-btn {
@@ -81,47 +83,55 @@
         }
         li.checked span { text-decoration: line-through; opacity: 0.4; }
         .delete-btn { color: #ff6584; cursor: pointer; font-size: 1.3rem; }
+
+        /* --- الفوتر (اسمك تحت) --- */
+        footer {
+            margin-top: auto; padding: 20px; text-align: center;
+            font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <span style="font-weight: bold;">قائمة مهامي</span>
-    </div>
+        <span style="font-weight: bold; font-size: 1.1rem;">قائمة المهام</span>
+        <div style="width: 24px;"></div> </div>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
         <h3>القائمة ⚙️</h3>
-        <a href="#">🏠 الرئيسية</a>
-        <a href="https://mohamed-portfolio-link.com">👤 البروفايل الشخصي</a>
-        <a href="#" onclick="clearAll()">🧹 مسح الكل</a>
+        <a href="#" onclick="toggleMenu()">🏠 الرئيسية</a>
+        <a href="#" onclick="clearAll()">🧹 مسح جميع المهام</a>
         <hr style="border: 0.5px solid #333; margin: 20px 0;">
-        <p style="font-size: 12px; color: #555;">نسخة التطبيق 2.0</p>
+        <p style="font-size: 12px; color: #555;">To-Do List v2.1</p>
     </div>
 
     <div class="container">
-        <h2>أهلاً يا محمد 👋</h2>
+        <h2 style="text-align: center; margin-top: 0;">ماذا ستنجز اليوم؟ ✍️</h2>
         <div class="input-box">
-            <input type="text" id="taskInput" placeholder="ما هي خطتك اليوم؟">
+            <input type="text" id="taskInput" placeholder="اكتب مهمة جديدة...">
             <button id="add-btn" onclick="addTask()">إضافة</button>
         </div>
         <ul id="taskList"></ul>
     </div>
 
+    <footer>
+        Developed by Mohamed Abobakr Abdelfattah
+    </footer>
+
     <script>
         const taskInput = document.getElementById("taskInput");
         const taskList = document.getElementById("taskList");
 
-        // حل مشكلة الصوت (تجهيز الأصوات)
         const addSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
         const deleteSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
         const checkSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3');
 
         function playSfx(audio) {
             audio.pause(); 
-            audio.currentTime = 0; // تصفير الصوت عشان يشتغل من الأول فوراً
-            audio.play();
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log("Sound play error")); 
         }
 
         window.onload = getTasks;
