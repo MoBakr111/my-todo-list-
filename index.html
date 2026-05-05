@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>قائمة مهامي الذكية</title>
     <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -14,132 +14,161 @@
             --sidebar-bg: #11111a;
         }
 
+        * { box-sizing: border-box; }
         body {
             font-family: 'Almarai', sans-serif;
             background-color: var(--bg);
-            background-image: radial-gradient(circle at 10% 20%, rgba(108, 99, 255, 0.1) 0%, transparent 20%);
+            background-image: radial-gradient(circle at 10% 20%, var(--accent), transparent 25%);
+            background-attachment: fixed;
             color: var(--text); margin: 0; padding-top: 80px; overflow-x: hidden;
-            display: flex; flex-direction: column; min-height: 100vh;
+            display: flex; flex-direction: column; min-height: 100vh; transition: 0.3s;
         }
 
-        /* --- تصليح الشريط العلوي --- */
+        /* --- الهيدر --- */
         .top-bar {
-            position: fixed; top: 0; left: 0; width: 100%; height: 60px;
-            background: var(--glass); backdrop-filter: blur(10px);
+            position: fixed; top: 0; left: 0; width: 100vw; height: 60px;
+            background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 15px; z-index: 1000; box-sizing: border-box;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0 15px; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        .menu-btn {
-            font-size: 24px; cursor: pointer; color: var(--accent);
-            background: none; border: none; padding: 5px;
-        }
+        .menu-btn { font-size: 24px; cursor: pointer; color: var(--accent); background: none; border: none; }
 
-        /* --- القائمة الجانبية --- */
+        /* --- القائمة الجانبية (Sidebar) --- */
         .sidebar {
             position: fixed; top: 0; right: -280px; width: 280px; height: 100%;
-            background: var(--sidebar-bg); z-index: 2000; transition: 0.4s;
-            padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.5);
-            border-left: 1px solid rgba(255,255,255,0.05);
+            background: var(--sidebar-bg); z-index: 2000; transition: 0.3s ease;
+            padding: 20px; box-shadow: -5px 0 15px rgba(0,0,0,0.5); border-left: 1px solid rgba(255,255,255,0.05);
+            overflow-y: auto;
         }
-
         .sidebar.open { right: 0; }
+        .sidebar h3 { color: var(--accent); margin: 20px 0 10px 0; font-size: 1rem; border-bottom: 1px solid #333; padding-bottom: 5px; }
 
-        .sidebar h3 { color: var(--accent); margin-bottom: 30px; }
-        .sidebar a {
-            display: block; color: var(--text); text-decoration: none;
-            padding: 12px; border-radius: 10px; margin-bottom: 10px; transition: 0.3s;
-        }
-        .sidebar a:hover { background: rgba(108, 99, 255, 0.1); }
+        /* مغير الألوان */
+        .theme-options { display: flex; gap: 10px; margin: 15px 0; }
+        .dot { width: 25px; height: 25px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .dot.active { border-color: white; }
 
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 1500; display: none;
-        }
+        /* تايمر التركيز */
+        .focus-timer { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; text-align: center; margin: 15px 0; }
+        #timer-display { font-size: 1.5rem; font-weight: bold; color: var(--accent); display: block; margin-bottom: 10px; }
+        .timer-btn { background: var(--accent); border: none; color: white; padding: 5px 15px; border-radius: 8px; cursor: pointer; font-family: 'Almarai'; }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 1500; display: none; }
 
         /* --- المحتوى --- */
         .container {
-            background: var(--glass); backdrop-filter: blur(15px);
-            width: 90%; max-width: 400px; padding: 30px; border-radius: 24px;
-            margin: 0 auto 40px auto; border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--glass); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            width: 92%; max-width: 400px; padding: 25px; border-radius: 24px;
+            margin: 0 auto 20px auto; border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        .stats-bar { background: rgba(108, 99, 255, 0.1); padding: 10px; border-radius: 12px; margin-bottom: 20px; text-align: center; font-size: 13px; border: 1px dashed var(--accent); }
 
         .input-box { display: flex; gap: 10px; margin-bottom: 25px; }
-        input {
-            flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.3); color: white; outline: none; font-family: 'Almarai';
-        }
-
-        button#add-btn {
-            padding: 10px 20px; border-radius: 14px; border: none; background: var(--accent);
-            color: white; font-weight: bold; cursor: pointer;
-        }
+        input { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; outline: none; font-family: 'Almarai'; }
+        button#add-btn { padding: 10px 15px; border-radius: 12px; border: none; background: var(--accent); color: white; font-weight: bold; cursor: pointer; }
 
         ul { list-style: none; padding: 0; }
-        li {
-            background: rgba(255, 255, 255, 0.03); padding: 16px; margin-bottom: 12px;
-            border-radius: 16px; display: flex; justify-content: space-between; align-items: center;
-        }
+        li { background: rgba(255, 255, 255, 0.03); padding: 14px; margin-bottom: 10px; border-radius: 14px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
         li.checked span { text-decoration: line-through; opacity: 0.4; }
-        .delete-btn { color: #ff6584; cursor: pointer; font-size: 1.3rem; }
+        .delete-btn { color: #ff6584; cursor: pointer; font-size: 1.2rem; }
 
-        /* --- الفوتر (اسمك تحت) --- */
-        footer {
-            margin-top: auto; padding: 20px; text-align: center;
-            font-size: 12px; color: rgba(255,255,255,0.3); letter-spacing: 1px;
-        }
+        footer { margin-top: auto; padding: 20px; text-align: center; font-size: 11px; color: rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
 
     <div class="top-bar">
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
-        <span style="font-weight: bold; font-size: 1.1rem;">قائمة المهام</span>
-        <div style="width: 24px;"></div> </div>
+        <span style="font-weight: bold;">قائمة المهام</span>
+        <div style="width: 35px;"></div>
+    </div>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
     <div class="sidebar" id="sidebar">
-        <h3>القائمة ⚙️</h3>
-        <a href="#" onclick="toggleMenu()">🏠 الرئيسية</a>
-        <a href="#" onclick="clearAll()">🧹 مسح جميع المهام</a>
+        <h3>الألوان 🎨</h3>
+        <div class="theme-options">
+            <div class="dot" style="background:#6c63ff" onclick="changeTheme('#6c63ff')"></div>
+            <div class="dot" style="background:#00d2ff" onclick="changeTheme('#00d2ff')"></div>
+            <div class="dot" style="background:#4caf50" onclick="changeTheme('#4caf50')"></div>
+            <div class="dot" style="background:#ff9800" onclick="changeTheme('#ff9800')"></div>
+        </div>
+
+        <h3>وقت التركيز ⏱️</h3>
+        <div class="focus-timer">
+            <span id="timer-display">25:00</span>
+            <button class="timer-btn" id="startTimer" onclick="startFocus()">ابدأ التركيز</button>
+        </div>
+
+        <h3>إعدادات ⚙️</h3>
+        <a href="#" onclick="clearAll()">🧹 مسح كل المهام</a>
         <hr style="border: 0.5px solid #333; margin: 20px 0;">
-        <p style="font-size: 12px; color: #555;">To-Do List v2.1</p>
+        <p style="font-size: 10px; color: #444;">التحديث v3.0</p>
     </div>
 
     <div class="container">
-        <h2 style="text-align: center; margin-top: 0;">ماذا ستنجز اليوم؟ ✍️</h2>
+        <div class="stats-bar" id="stats">أنجزت 0 من 0 مهام 🔥</div>
         <div class="input-box">
-            <input type="text" id="taskInput" placeholder="اكتب مهمة جديدة...">
+            <input type="text" id="taskInput" placeholder="أضف مهمة جديدة...">
             <button id="add-btn" onclick="addTask()">إضافة</button>
         </div>
         <ul id="taskList"></ul>
     </div>
 
-    <footer>
-        Developed by Mohamed Abobakr Abdelfattah
-    </footer>
+    <footer>Developed by Mohamed Abobakr Abdelfattah</footer>
 
     <script>
         const taskInput = document.getElementById("taskInput");
         const taskList = document.getElementById("taskList");
+        const statsBar = document.getElementById("stats");
 
+        // الأصوات
         const addSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
         const deleteSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
         const checkSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3');
 
-        function playSfx(audio) {
-            audio.pause(); 
-            audio.currentTime = 0;
-            audio.play().catch(e => console.log("Sound play error")); 
-        }
+        function playSfx(audio) { audio.pause(); audio.currentTime = 0; audio.play().catch(e=>{}); }
 
-        window.onload = getTasks;
+        window.onload = () => { getTasks(); updateStats(); };
 
         function toggleMenu() {
-            document.getElementById('sidebar').classList.toggle('open');
-            const overlay = document.getElementById('overlay');
-            overlay.style.display = overlay.style.display === 'block' ? 'none' : 'block';
+            const sb = document.getElementById('sidebar');
+            const ov = document.getElementById('overlay');
+            sb.classList.toggle('open');
+            ov.style.display = sb.classList.contains('open') ? 'block' : 'none';
+        }
+
+        // 1. مغير الألوان
+        function changeTheme(color) {
+            document.documentElement.style.setProperty('--accent', color);
+            localStorage.setItem('themeColor', color);
+        }
+        const savedColor = localStorage.getItem('themeColor');
+        if(savedColor) changeTheme(savedColor);
+
+        // 2. تايمر التركيز
+        let timer;
+        function startFocus() {
+            let seconds = 25 * 60;
+            const display = document.getElementById('timer-display');
+            const btn = document.getElementById('startTimer');
+            if (btn.innerText === "إيقاف") { clearInterval(timer); btn.innerText = "ابدأ التركيز"; display.innerText = "25:00"; return; }
+            btn.innerText = "إيقاف";
+            timer = setInterval(() => {
+                seconds--;
+                let mins = Math.floor(seconds / 60);
+                let secs = seconds % 60;
+                display.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                if (seconds <= 0) { clearInterval(timer); alert("انتهى وقت التركيز! خذ راحة."); btn.innerText = "ابدأ التركيز"; }
+            }, 1000);
+        }
+
+        // 3. عداد المهام
+        function updateStats() {
+            const total = taskList.children.length;
+            const done = document.querySelectorAll('li.checked').length;
+            statsBar.innerText = `أنجزت ${done} من ${total} مهام ${done == total && total > 0 ? '🏆' : '🔥'}`;
         }
 
         function addTask() {
@@ -149,10 +178,12 @@
             saveLocal(val);
             playSfx(addSound);
             taskInput.value = "";
+            updateStats();
         }
 
-        function createTaskElement(text) {
+        function createTaskElement(text, isDone = false) {
             const li = document.createElement("li");
+            if(isDone) li.classList.add('checked');
             li.innerHTML = `
                 <span style="flex:1; cursor:pointer;" onclick="toggleCheck(this)">${text}</span>
                 <span class="delete-btn" onclick="removeT(this, '${text}')">×</span>
@@ -163,31 +194,41 @@
         function toggleCheck(el) {
             el.parentElement.classList.toggle('checked');
             playSfx(checkSound);
+            updateStats();
+            updateLocal();
         }
 
         function removeT(btn, text) {
             playSfx(deleteSound);
             btn.parentElement.remove();
-            let tasks = JSON.parse(localStorage.getItem("tasks"));
-            tasks.splice(tasks.indexOf(text), 1);
-            localStorage.setItem("tasks", JSON.stringify(tasks));
+            updateLocal();
+            updateStats();
+        }
+
+        function updateLocal() {
+            let tasks = [];
+            document.querySelectorAll('li').forEach(li => {
+                tasks.push({ text: li.querySelector('span').innerText, done: li.classList.contains('checked') });
+            });
+            localStorage.setItem("tasks_v3", JSON.stringify(tasks));
         }
 
         function saveLocal(t) {
-            let tasks = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-            tasks.push(t);
-            localStorage.setItem("tasks", JSON.stringify(tasks));
+            let tasks = localStorage.getItem("tasks_v3") ? JSON.parse(localStorage.getItem("tasks_v3")) : [];
+            tasks.push({ text: t, done: false });
+            localStorage.setItem("tasks_v3", JSON.stringify(tasks));
         }
 
         function getTasks() {
-            let tasks = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-            tasks.forEach(t => createTaskElement(t));
+            let tasks = localStorage.getItem("tasks_v3") ? JSON.parse(localStorage.getItem("tasks_v3")) : [];
+            tasks.forEach(t => createTaskElement(t.text, t.done));
         }
 
         function clearAll() {
-            if(confirm("هل تريد مسح جميع المهام؟")) {
-                localStorage.removeItem("tasks");
+            if(confirm("تمسح كل المهام؟")) {
+                localStorage.removeItem("tasks_v3");
                 taskList.innerHTML = "";
+                updateStats();
                 toggleMenu();
             }
         }
@@ -196,3 +237,4 @@
     </script>
 </body>
 </html>
+
