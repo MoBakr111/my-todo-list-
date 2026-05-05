@@ -31,19 +31,9 @@
             overflow-x: hidden;
         }
 
-        /* إضافة أنيميشن بسيط للخلفية */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
-            opacity: 0.1;
-            z-index: -1;
-        }
-
         .container {
             background: var(--glass);
-            backdrop-filter: blur(15px); /* تأثير الزجاج المضبب */
+            backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             width: 90%;
             max-width: 400px;
@@ -54,7 +44,6 @@
             position: relative;
         }
 
-        /* خط الـ Gradient الملون فوق المربع */
         .container::before {
             content: '';
             position: absolute;
@@ -63,96 +52,47 @@
             border-radius: 24px 24px 0 0;
         }
 
-        h2 { 
-            text-align: center; 
-            margin-bottom: 25px; 
-            color: #fff; 
-            font-weight: 700;
-            text-shadow: 0 0 10px var(--accent-glow);
-        }
+        h2 { text-align: center; margin-bottom: 25px; color: #fff; text-shadow: 0 0 10px var(--accent-glow); }
 
-        .input-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
+        .input-box { display: flex; gap: 10px; margin-bottom: 25px; }
 
         input {
-            flex: 1;
-            padding: 14px;
-            border-radius: 14px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.3);
-            color: white;
-            outline: none;
-            transition: 0.3s;
+            flex: 1; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3); color: white; outline: none; transition: 0.3s;
         }
 
-        input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
+        input:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
 
         button#add-btn {
-            padding: 10px 20px;
-            border-radius: 14px;
-            border: none;
-            background: var(--accent);
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px 15px var(--accent-glow);
-            transition: 0.3s;
+            padding: 10px 20px; border-radius: 14px; border: none; background: var(--accent);
+            color: white; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px var(--accent-glow); transition: 0.3s;
         }
 
-        button#add-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--accent-glow); }
+        button#add-btn:hover { transform: translateY(-2px); }
 
         ul { list-style: none; padding: 0; }
 
         li {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 16px;
-            margin-bottom: 12px;
-            border-radius: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s;
-            animation: slideIn 0.4s ease-out;
+            background: rgba(255, 255, 255, 0.03); padding: 16px; margin-bottom: 12px;
+            border-radius: 16px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; animation: slideIn 0.4s ease-out;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
+        li:hover { background: rgba(255, 255, 255, 0.07); border-color: var(--accent); }
 
-        li:hover {
-            background: rgba(255, 255, 255, 0.07);
-            border-color: var(--accent);
-        }
+        li.checked span { text-decoration: line-through; opacity: 0.4; }
 
-        li.checked span {
-            text-decoration: line-through;
-            opacity: 0.4;
-        }
+        .delete-btn { color: var(--danger); cursor: pointer; font-size: 1.3rem; transition: 0.2s; padding: 0 5px; }
 
-        .delete-btn {
-            color: var(--danger);
-            cursor: pointer;
-            font-size: 1.3rem;
-            transition: 0.2s;
-        }
+        .task-text { flex: 1; cursor: pointer; }
 
-        .delete-btn:hover { transform: scale(1.2); }
-
-        .task-text { flex: 1; cursor: pointer; font-size: 1rem; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>مهامي اليومية 📝</h2>
+    <h2>مهامي الذكية 🚀</h2>
     <div class="input-box">
         <input type="text" id="taskInput" placeholder="ماذا سننجز اليوم؟">
         <button id="add-btn" onclick="addTask()">إضافة</button>
@@ -164,26 +104,39 @@
     const taskInput = document.getElementById("taskInput");
     const taskList = document.getElementById("taskList");
 
+    // تعريف الأصوات
+    const addSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+    const deleteSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+    const checkSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2570/2570-preview.mp3');
+
     window.onload = getTasks;
 
     function addTask() {
         const val = taskInput.value.trim();
         if (val === '') return alert("اكتب حاجة يا محمد!");
+        
         createTaskElement(val);
         saveLocal(val);
+        addSound.play(); // تشغيل صوت الإضافة
         taskInput.value = "";
     }
 
     function createTaskElement(text) {
         const li = document.createElement("li");
         li.innerHTML = `
-            <span class="task-text" onclick="this.parentElement.classList.toggle('checked')">${text}</span>
+            <span class="task-text" onclick="toggleCheck(this)">${text}</span>
             <span class="delete-btn" onclick="removeT(this, '${text}')">×</span>
         `;
         taskList.appendChild(li);
     }
 
+    function toggleCheck(el) {
+        el.parentElement.classList.toggle('checked');
+        checkSound.play(); // تشغيل صوت عند الانتهاء
+    }
+
     function removeT(btn, text) {
+        deleteSound.play(); // تشغيل صوت الحذف
         btn.parentElement.remove();
         let tasks = JSON.parse(localStorage.getItem("tasks"));
         tasks.splice(tasks.indexOf(text), 1);
