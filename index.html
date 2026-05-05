@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قائمة مهام محمد | الاحترافية</title>
+    <title>مهامي الذكية | Mohamed Bakr</title>
     <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0a0a0f;
-            --card: #1a1a26;
+            --bg: #050508;
+            --glass: rgba(26, 26, 38, 0.8);
             --accent: #6c63ff;
+            --accent-glow: rgba(108, 99, 255, 0.4);
             --text: #e8e8f0;
             --danger: #ff6584;
         }
@@ -17,6 +18,9 @@
         body {
             font-family: 'Almarai', sans-serif;
             background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(108, 99, 255, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 101, 132, 0.1) 0%, transparent 20%);
             color: var(--text);
             display: flex;
             justify-content: center;
@@ -24,87 +28,133 @@
             min-height: 100vh;
             margin: 0;
             padding-top: 50px;
+            overflow-x: hidden;
+        }
+
+        /* إضافة أنيميشن بسيط للخلفية */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+            opacity: 0.1;
+            z-index: -1;
         }
 
         .container {
-            background: var(--card);
+            background: var(--glass);
+            backdrop-filter: blur(15px); /* تأثير الزجاج المضبب */
+            -webkit-backdrop-filter: blur(15px);
             width: 90%;
             max-width: 400px;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            border: 1px solid rgba(108,99,255,0.1);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
         }
 
-        h2 { text-align: center; margin-bottom: 25px; color: var(--accent); font-weight: 700; }
+        /* خط الـ Gradient الملون فوق المربع */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--accent), #ff6584);
+            border-radius: 24px 24px 0 0;
+        }
+
+        h2 { 
+            text-align: center; 
+            margin-bottom: 25px; 
+            color: #fff; 
+            font-weight: 700;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
 
         .input-box {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         input {
             flex: 1;
             padding: 14px;
-            border-radius: 12px;
-            border: 1px solid #333;
-            background: #0f0f1a;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
             color: white;
             outline: none;
             transition: 0.3s;
         }
 
-        input:focus { border-color: var(--accent); }
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
 
         button#add-btn {
             padding: 10px 20px;
-            border-radius: 12px;
+            border-radius: 14px;
             border: none;
             background: var(--accent);
             color: white;
             font-weight: bold;
             cursor: pointer;
+            box-shadow: 0 5px 15px var(--accent-glow);
             transition: 0.3s;
         }
 
-        button#add-btn:hover { opacity: 0.8; transform: scale(1.05); }
+        button#add-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px var(--accent-glow); }
 
         ul { list-style: none; padding: 0; }
 
         li {
-            background: rgba(255,255,255,0.05);
-            padding: 14px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 16px;
             margin-bottom: 12px;
-            border-radius: 12px;
+            border-radius: 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border: 1px solid rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
             transition: 0.3s;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        li:hover {
+            background: rgba(255, 255, 255, 0.07);
+            border-color: var(--accent);
         }
 
         li.checked span {
             text-decoration: line-through;
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
         .delete-btn {
             color: var(--danger);
             cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0 5px;
+            font-size: 1.3rem;
+            transition: 0.2s;
         }
 
-        .task-text { flex: 1; cursor: pointer; }
+        .delete-btn:hover { transform: scale(1.2); }
+
+        .task-text { flex: 1; cursor: pointer; font-size: 1rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>مهامي الذكية 🚀</h2>
+    <h2>مهامي اليومية 📝</h2>
     <div class="input-box">
-        <input type="text" id="taskInput" placeholder="اكتب مهمة جديدة...">
+        <input type="text" id="taskInput" placeholder="ماذا سننجز اليوم؟">
         <button id="add-btn" onclick="addTask()">إضافة</button>
     </div>
     <ul id="taskList"></ul>
@@ -114,21 +164,13 @@
     const taskInput = document.getElementById("taskInput");
     const taskList = document.getElementById("taskList");
 
-    // 1. تحميل المهام من الذاكرة أول ما الصفحة تفتح
-    document.addEventListener("DOMContentLoaded", getTasks);
+    window.onload = getTasks;
 
     function addTask() {
-        if (taskInput.value === '') {
-            alert("اكتب حاجة يا محمد!");
-            return;
-        }
-
-        const taskValue = taskInput.value;
-        createTaskElement(taskValue);
-        
-        // 2. حفظ المهمة في الذاكرة
-        saveLocalTasks(taskValue);
-
+        const val = taskInput.value.trim();
+        if (val === '') return alert("اكتب حاجة يا محمد!");
+        createTaskElement(val);
+        saveLocal(val);
         taskInput.value = "";
     }
 
@@ -136,41 +178,30 @@
         const li = document.createElement("li");
         li.innerHTML = `
             <span class="task-text" onclick="this.parentElement.classList.toggle('checked')">${text}</span>
-            <span class="delete-btn" onclick="removeTask(this)">×</span>
+            <span class="delete-btn" onclick="removeT(this, '${text}')">×</span>
         `;
         taskList.appendChild(li);
     }
 
-    function removeTask(btn) {
-        const taskItem = btn.parentElement;
-        const taskText = taskItem.querySelector('.task-text').innerText;
-        
-        // مسح من الذاكرة
-        removeLocalTasks(taskText);
-        
-        taskItem.remove();
+    function removeT(btn, text) {
+        btn.parentElement.remove();
+        let tasks = JSON.parse(localStorage.getItem("tasks"));
+        tasks.splice(tasks.indexOf(text), 1);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
     }
 
-    // --- وظائف الـ Local Storage (المخزن السري) ---
-
-    function saveLocalTasks(task) {
+    function saveLocal(t) {
         let tasks = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-        tasks.push(task);
+        tasks.push(t);
         localStorage.setItem("tasks", JSON.stringify(tasks));
     }
 
     function getTasks() {
         let tasks = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
-        tasks.forEach(task => createTaskElement(task));
+        taskList.innerHTML = "";
+        tasks.forEach(t => createTaskElement(t));
     }
 
-    function removeLocalTasks(task) {
-        let tasks = JSON.parse(localStorage.getItem("tasks"));
-        const filteredTasks = tasks.filter(t => t !== task);
-        localStorage.setItem("tasks", JSON.stringify(filteredTasks));
-    }
-
-    // الإضافة بـ Enter
     taskInput.addEventListener("keypress", (e) => { if (e.key === "Enter") addTask(); });
 </script>
 
