@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قائمة المهام | To-Do List</title>
+    <title>قائمة مهام محمد | الاحترافية</title>
     <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,6 +11,7 @@
             --card: #1a1a26;
             --accent: #6c63ff;
             --text: #e8e8f0;
+            --danger: #ff6584;
         }
 
         body {
@@ -29,12 +30,13 @@
             background: var(--card);
             width: 90%;
             max-width: 400px;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            border: 1px solid rgba(108,99,255,0.1);
         }
 
-        h2 { text-align: center; margin-bottom: 20px; color: var(--accent); }
+        h2 { text-align: center; margin-bottom: 25px; color: var(--accent); font-weight: 700; }
 
         .input-box {
             display: flex;
@@ -44,109 +46,133 @@
 
         input {
             flex: 1;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 12px;
             border: 1px solid #333;
             background: #0f0f1a;
             color: white;
             outline: none;
+            transition: 0.3s;
         }
+
+        input:focus { border-color: var(--accent); }
 
         button#add-btn {
             padding: 10px 20px;
-            border-radius: 8px;
+            border-radius: 12px;
             border: none;
             background: var(--accent);
             color: white;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.3s;
         }
+
+        button#add-btn:hover { opacity: 0.8; transform: scale(1.05); }
 
         ul { list-style: none; padding: 0; }
 
         li {
-            background: #252538;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            padding: 14px;
+            margin-bottom: 12px;
+            border-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            animation: fadeIn 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.02);
+            transition: 0.3s;
         }
 
-        li.checked {
+        li.checked span {
             text-decoration: line-through;
-            opacity: 0.6;
+            opacity: 0.5;
         }
 
         .delete-btn {
-            color: #ff6584;
+            color: var(--danger);
             cursor: pointer;
-            font-weight: bold;
-            padding: 5px 10px;
+            font-size: 1.2rem;
+            padding: 0 5px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .task-text { flex: 1; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>مهامي اليومية 📝</h2>
+    <h2>مهامي الذكية 🚀</h2>
     <div class="input-box">
-        <input type="text" id="taskInput" placeholder="ماذا تريد أن تفعل؟">
-        <button id="add-btn" onclick="newElement()">إضافة</button>
+        <input type="text" id="taskInput" placeholder="اكتب مهمة جديدة...">
+        <button id="add-btn" onclick="addTask()">إضافة</button>
     </div>
-    <ul id="myUL">
-        </ul>
+    <ul id="taskList"></ul>
 </div>
 
 <script>
-    // وظيفة إضافة مهمة جديدة
-    function newElement() {
-        var li = document.createElement("li");
-        var inputValue = document.getElementById("taskInput").value;
-        var t = document.createTextNode(inputValue);
-        li.appendChild(t);
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+
+    // 1. تحميل المهام من الذاكرة أول ما الصفحة تفتح
+    document.addEventListener("DOMContentLoaded", getTasks);
+
+    function addTask() {
+        if (taskInput.value === '') {
+            alert("اكتب حاجة يا محمد!");
+            return;
+        }
+
+        const taskValue = taskInput.value;
+        createTaskElement(taskValue);
         
-        if (inputValue === '') {
-            alert("لازم تكتب حاجة يا محمد!");
-        } else {
-            document.getElementById("myUL").appendChild(li);
-        }
-        document.getElementById("taskInput").value = "";
+        // 2. حفظ المهمة في الذاكرة
+        saveLocalTasks(taskValue);
 
-        // إضافة زرار المسح
-        var span = document.createElement("SPAN");
-        var txt = document.createTextNode("\u00D7");
-        span.className = "delete-btn";
-        span.appendChild(txt);
-        li.appendChild(span);
-
-        // تفعيل المسح عند الضغط
-        span.onclick = function() {
-            var div = this.parentElement;
-            div.style.display = "none";
-        }
-
-        // تفعيل الشطب على المهمة عند الضغط عليها
-        li.onclick = function() {
-            this.classList.toggle('checked');
-        }
+        taskInput.value = "";
     }
 
-    // السماح بالإضافة عند الضغط على Enter
-    document.getElementById("taskInput").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            newElement();
-        }
-    });
+    function createTaskElement(text) {
+        const li = document.createElement("li");
+        li.innerHTML = `
+            <span class="task-text" onclick="this.parentElement.classList.toggle('checked')">${text}</span>
+            <span class="delete-btn" onclick="removeTask(this)">×</span>
+        `;
+        taskList.appendChild(li);
+    }
+
+    function removeTask(btn) {
+        const taskItem = btn.parentElement;
+        const taskText = taskItem.querySelector('.task-text').innerText;
+        
+        // مسح من الذاكرة
+        removeLocalTasks(taskText);
+        
+        taskItem.remove();
+    }
+
+    // --- وظائف الـ Local Storage (المخزن السري) ---
+
+    function saveLocalTasks(task) {
+        let tasks = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
+        tasks.push(task);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function getTasks() {
+        let tasks = localStorage.getItem("tasks") ? JSON.parse(localStorage.getItem("tasks")) : [];
+        tasks.forEach(task => createTaskElement(task));
+    }
+
+    function removeLocalTasks(task) {
+        let tasks = JSON.parse(localStorage.getItem("tasks"));
+        const filteredTasks = tasks.filter(t => t !== task);
+        localStorage.setItem("tasks", JSON.stringify(filteredTasks));
+    }
+
+    // الإضافة بـ Enter
+    taskInput.addEventListener("keypress", (e) => { if (e.key === "Enter") addTask(); });
 </script>
 
 </body>
 </html>
-
