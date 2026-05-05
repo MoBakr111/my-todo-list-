@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قائمة المهام | To-Do List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --card: #1a1a26;
+            --accent: #6c63ff;
+            --text: #e8e8f0;
+        }
+
+        body {
+            font-family: 'Almarai', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding-top: 50px;
+        }
+
+        .container {
+            background: var(--card);
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h2 { text-align: center; margin-bottom: 20px; color: var(--accent); }
+
+        .input-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #0f0f1a;
+            color: white;
+            outline: none;
+        }
+
+        button#add-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        ul { list-style: none; padding: 0; }
+
+        li {
+            background: #252538;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        li.checked {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .delete-btn {
+            color: #ff6584;
+            cursor: pointer;
+            font-weight: bold;
+            padding: 5px 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>مهامي اليومية 📝</h2>
+    <div class="input-box">
+        <input type="text" id="taskInput" placeholder="ماذا تريد أن تفعل؟">
+        <button id="add-btn" onclick="newElement()">إضافة</button>
+    </div>
+    <ul id="myUL">
+        </ul>
+</div>
+
+<script>
+    // وظيفة إضافة مهمة جديدة
+    function newElement() {
+        var li = document.createElement("li");
+        var inputValue = document.getElementById("taskInput").value;
+        var t = document.createTextNode(inputValue);
+        li.appendChild(t);
+        
+        if (inputValue === '') {
+            alert("لازم تكتب حاجة يا محمد!");
+        } else {
+            document.getElementById("myUL").appendChild(li);
+        }
+        document.getElementById("taskInput").value = "";
+
+        // إضافة زرار المسح
+        var span = document.createElement("SPAN");
+        var txt = document.createTextNode("\u00D7");
+        span.className = "delete-btn";
+        span.appendChild(txt);
+        li.appendChild(span);
+
+        // تفعيل المسح عند الضغط
+        span.onclick = function() {
+            var div = this.parentElement;
+            div.style.display = "none";
+        }
+
+        // تفعيل الشطب على المهمة عند الضغط عليها
+        li.onclick = function() {
+            this.classList.toggle('checked');
+        }
+    }
+
+    // السماح بالإضافة عند الضغط على Enter
+    document.getElementById("taskInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            newElement();
+        }
+    });
+</script>
+
+</body>
+</html>
+
